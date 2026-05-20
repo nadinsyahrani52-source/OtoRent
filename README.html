@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OtoRent - Sewa Mobil Mudah & Terpercaya</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes checkPop { 0% { transform: scale(0); } 70% { transform: scale(1.2); } 100% { transform: scale(1); } }
+    .modal-anim { animation: fadeIn 0.25s ease; }
+    .slide-up { animation: slideUp 0.35s ease; }
+    .spinner { animation: spin 0.8s linear infinite; }
+    .check-pop { animation: checkPop 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen pb-20 font-sans text-gray-800">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-sm py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-40">
+    <h1 class="text-2xl font-black text-blue-600">OtoRent</h1>
+    <div class="hidden md:flex gap-6 font-medium text-gray-600">
+      <a href="#" class="hover:text-blue-600 transition">Beranda</a>
+      <a href="#katalog" class="hover:text-blue-600 transition">Daftar Mobil</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="relative bg-blue-900 text-white overflow-hidden">
+    <div class="absolute inset-0 bg-black/50 z-10"></div>
+    <img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=1200" alt="Hero Car" class="absolute inset-0 w-full h-full object-cover">
+    <div class="relative z-20 container mx-auto px-6 py-24 md:py-32 text-center">
+      <h2 class="text-4xl md:text-6xl font-bold mb-4">Sewa Mobil Mudah & Terpercaya</h2>
+      <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto opacity-90">Nikmati perjalanan Anda dengan armada terbaik kami. Bebas repot, harga transparan, dan jaminan kenyamanan.</p>
+      <a href="#katalog" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-full font-bold text-lg transition shadow-lg inline-block">
+        Cari Mobil Sekarang
+      </a>
+    </div>
+  </section>
+
+  <!-- Fitur Keunggulan -->
+  <section class="container mx-auto px-6 py-12">
+    <div class="grid md:grid-cols-3 gap-8 text-center -mt-20 relative z-30">
+      <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-600">
+        <h3 class="text-xl font-bold mb-2">Harga Transparan</h3>
+        <p class="text-gray-600">Tanpa biaya tersembunyi. Harga yang Anda lihat adalah harga yang Anda bayar.</p>
+      </div>
+      <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-600">
+        <h3 class="text-xl font-bold mb-2">Armada Terawat</h3>
+        <p class="text-gray-600">Setiap mobil rutin diservis dan dibersihkan sebelum diserahkan ke pelanggan.</p>
+      </div>
+      <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-600">
+        <h3 class="text-xl font-bold mb-2">Dukungan 24/7</h3>
+        <p class="text-gray-600">Tim kami siap membantu Anda kapan pun, di mana pun Anda berada.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Katalog Mobil -->
+  <section id="katalog" class="container mx-auto px-6 py-12">
+    <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Pilihan Armada Kami</h2>
+    <div id="car-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+  </section>
+
+  <!-- Modal Pemesanan -->
+  <div id="booking-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 overflow-y-auto backdrop-blur-sm">
+    <div class="modal-anim bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 relative">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-2xl font-bold transition">✖</button>
+      
+      <h2 id="modal-car-name" class="text-2xl font-bold mb-6 text-gray-800">Formulir Sewa</h2>
+      
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Jenis Layanan</label>
+            <select id="service-type" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" onchange="calculatePrice()">
+              <option value="lepas-kunci">Lepas Kunci (Self-Drive)</option>
+              <option id="driver-option" value="dengan-sopir">Dengan Sopir</option>
+            </select>
+            <p id="lepas-kunci-warning" class="text-xs text-orange-600 mt-1">⚠️ Wajib menyerahkan jaminan KTP asli & memiliki SIM A.</p>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-1">Tanggal Mulai</label>
+              <input type="date" id="start-date" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" onchange="calculatePrice()">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Tanggal Selesai</label>
+              <input type="date" id="end-date" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" onchange="calculatePrice()">
+            </div>
+          </div>
+
+          <div class="bg-gray-50 p-4 rounded-lg mt-4 border border-gray-200">
+            <p class="text-sm text-gray-600">Durasi: <span id="total-days" class="font-bold">0</span> Hari</p>
+            <p class="text-xl font-bold text-blue-600 mt-1">Total: Rp <span id="total-price">0</span></p>
+          </div>
+          
+          <!-- Tombol Konfirmasi yang sudah diperbaiki -->
+          <button onclick="handleConfirmOrder()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg mt-4 transition shadow-md">
+            Konfirmasi Pesanan
+          </button>
+        </div>
+
+        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+          <h3 class="font-bold text-blue-800 mb-3">Informasi & Syarat</h3>
+          <ul class="text-sm text-blue-900 space-y-3">
+            <li>💳 <strong>Metode Bayar:</strong> Transfer Bank (BCA, Mandiri), E-Wallet, Kartu Kredit.</li>
+            <li>💰 <strong>Uang Muka (DP):</strong> Minimal 30% dari total harga sewa dibayar di muka.</li>
+            <li>🔄 <strong>Refund:</strong> Pembatalan H-1 dikenakan potongan 50% dari DP.</li>
+            <li>📄 <strong>Dokumen:</strong> KTP asli ditahan (khusus layanan lepas kunci).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Konfirmasi Ringkasan Pesanan -->
+  <div id="confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-[60] backdrop-blur-sm">
+    <div class="slide-up bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl">
+      <h3 class="text-xl font-bold mb-4 text-gray-800 border-b pb-3">📋 Ringkasan Pesanan</h3>
+      <div id="confirm-summary" class="space-y-3 text-sm mb-5"></div>
+
+      <!-- Pilih Metode Pembayaran -->
+      <div class="mb-5">
+        <label class="block text-sm font-semibold mb-2 text-gray-700">Pilih Metode Pembayaran</label>
+        <div class="grid grid-cols-2 gap-2">
+          <label class="flex items-center gap-2 border rounded-lg p-2 cursor-pointer hover:border-blue-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 transition">
+            <input type="radio" name="payment" value="BCA" class="accent-blue-600"> <span>🏦 BCA</span>
+          </label>
+          <label class="flex items-center gap-2 border rounded-lg p-2 cursor-pointer hover:border-blue-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 transition">
+            <input type="radio" name="payment" value="Mandiri" class="accent-blue-600"> <span>🏦 Mandiri</span>
+          </label>
+          <label class="flex items-center gap-2 border rounded-lg p-2 cursor-pointer hover:border-blue-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 transition">
+            <input type="radio" name="payment" value="GoPay" class="accent-blue-600"> <span>💚 GoPay</span>
+          </label>
+          <label class="flex items-center gap-2 border rounded-lg p-2 cursor-pointer hover:border-blue-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 transition">
+            <input type="radio" name="payment" value="OVO" class="accent-blue-600"> <span>💜 OVO</span>
+          </label>
+        </div>
+        <p id="payment-error" class="text-red-500 text-xs mt-1 hidden">⚠️ Pilih metode pembayaran terlebih dahulu.</p>
+      </div>
+
+      <div class="flex gap-3">
+        <button onclick="closeConfirmModal()" class="flex-1 border border-gray-300 hover:bg-gray-100 py-2 rounded-lg font-medium transition text-gray-700">
+          Batal
+        </button>
+        <button onclick="processPayment()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold transition">
+          Bayar Sekarang
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Loading Pembayaran -->
+  <div id="loading-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[70] backdrop-blur-sm">
+    <div class="bg-white rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl">
+      <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full spinner"></div>
+      <p class="text-gray-700 font-medium">Memproses pembayaran...</p>
+    </div>
+  </div>
+
+  <!-- Modal Sukses -->
+  <div id="success-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-[70] backdrop-blur-sm">
+    <div class="slide-up bg-white rounded-2xl w-full max-w-sm p-8 text-center shadow-2xl">
+      <div class="check-pop w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <h3 class="text-2xl font-bold text-gray-800 mb-2">Pesanan Berhasil!</h3>
+      <p class="text-gray-500 mb-1">Nomor Pesanan:</p>
+      <p id="order-number" class="text-blue-600 font-bold text-lg mb-4"></p>
+      <p class="text-sm text-gray-600 mb-6">Detail pesanan dan instruksi pembayaran akan dikirim ke WhatsApp / email Anda dalam beberapa menit.</p>
+      <button onclick="closeAllModals()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition">
+        Selesai
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const cars = [
+      { id: 1, name: "Toyota Avanza", image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=400&h=250", capacity: 7, transmission: "Automatic", pricePerDay: 400000, driverFeePerDay: 150000 },
+      { id: 2, name: "Honda Brio", image: "https://images.unsplash.com/photo-1503376710912-32b84787f71f?auto=format&fit=crop&q=80&w=400&h=250", capacity: 4, transmission: "Manual", pricePerDay: 300000, driverFeePerDay: 150000 },
+      { id: 3, name: "Mitsubishi Pajero", image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=400&h=250", capacity: 7, transmission: "Automatic", pricePerDay: 900000, driverFeePerDay: 200000 }
+    ];
+
+    let selectedCar = null;
+    let currentBooking = null;
+
+    const formatRp = (n) => n.toLocaleString('id-ID');
+
+    const renderCars = () => {
+      const container = document.getElementById('car-list');
+      container.innerHTML = '';
+      cars.forEach(car => {
+        container.innerHTML += `
+          <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+            <img src="${car.image}" alt="${car.name}" class="w-full h-48 object-cover" />
+            <div class="p-5">
+              <h3 class="text-xl font-bold text-gray-800 mb-2">${car.name}</h3>
+              <div class="flex gap-4 text-sm text-gray-600 mb-4">
+                <span>👥 ${car.capacity} Penumpang</span>
+                <span>⚙️ ${car.transmission}</span>
+              </div>
+              <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
+                <div>
+                  <p class="text-xs text-gray-500">Mulai dari</p>
+                  <p class="text-lg font-bold text-blue-600">Rp ${formatRp(car.pricePerDay)}<span class="text-sm font-normal text-gray-500">/hari</span></p>
+                </div>
+                <button onclick="openModal(${car.id})" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition">Sewa Sekarang</button>
+              </div>
+            </div>
+          </div>`;
+      });
+    };
+
+    const openModal = (carId) => {
+      selectedCar = cars.find(c => c.id === carId);
+      document.getElementById('modal-car-name').innerText = `Formulir Sewa: ${selectedCar.name}`;
+      document.getElementById('driver-option').innerText = `Dengan Sopir (+ Rp ${formatRp(selectedCar.driverFeePerDay)}/hari)`;
+      document.getElementById('start-date').value = '';
+      document.getElementById('end-date').value = '';
+      document.getElementById('service-type').value = 'lepas-kunci';
+      document.getElementById('total-days').innerText = '0';
+      document.getElementById('total-price').innerText = '0';
+      document.getElementById('booking-modal').classList.remove('hidden');
+    };
+
+    const closeModal = () => {
+      document.getElementById('booking-modal').classList.add('hidden');
+      selectedCar = null;
+    };
+
+    const calculatePrice = () => {
+      if (!selectedCar) return;
+      const startVal = document.getElementById('start-date').value;
+      const endVal = document.getElementById('end-date').value;
+      const serviceType = document.getElementById('service-type').value;
+      const warning = document.getElementById('lepas-kunci-warning');
+
+      warning.classList.toggle('hidden', serviceType !== 'lepas-kunci');
+
+      if (startVal && endVal) {
+        const start = new Date(startVal), end = new Date(endVal);
+        if (end < start) {
+          document.getElementById('total-days').innerText = '0';
+          document.getElementById('total-price').innerText = 'Tanggal tidak valid';
+          return;
+        }
+        let days = Math.ceil(Math.abs(end - start) / 86400000) || 1;
+        document.getElementById('total-days').innerText = days;
+        const driverCost = serviceType === 'dengan-sopir' ? selectedCar.driverFeePerDay : 0;
+        document.getElementById('total-price').innerText = formatRp(days * (selectedCar.pricePerDay + driverCost));
+      }
+    };
+
+    // ✅ DIPERBAIKI: Fungsi konfirmasi pesanan yang proper
+    const handleConfirmOrder = () => {
+      const startVal = document.getElementById('start-date').value;
+      const endVal = document.getElementById('end-date').value;
+      const serviceType = document.getElementById('service-type').value;
+      const totalDays = document.getElementById('total-days').innerText;
+      const totalPrice = document.getElementById('total-price').innerText;
+
+      // Validasi input
+      if (!startVal || !endVal) {
+        showToast('⚠️ Pilih tanggal mulai dan selesai terlebih dahulu!');
+        return;
+      }
+      if (totalDays === '0' || totalPrice === 'Tanggal tidak valid') {
+        showToast('⚠️ Tanggal tidak valid, periksa kembali.');
+        return;
+      }
+
+      const start = new Date(startVal), end = new Date(endVal);
+      const driverCost = serviceType === 'dengan-sopir' ? selectedCar.driverFeePerDay : 0;
+      const days = Math.ceil(Math.abs(end - start) / 86400000) || 1;
+      const total = days * (selectedCar.pricePerDay + driverCost);
+      const dp = Math.ceil(total * 0.3);
+
+      // Simpan data booking
+      currentBooking = { car: selectedCar, serviceType, startVal, endVal, days, total, dp };
+
+      // Isi ringkasan
+      const serviceLabel = serviceType === 'dengan-sopir' ? 'Dengan Sopir' : 'Lepas Kunci (Self-Drive)';
+      document.getElementById('confirm-summary').innerHTML = `
+        <div class="bg-gray-50 rounded-lg p-4 space-y-2">
+          <div class="flex justify-between"><span class="text-gray-500">Kendaraan</span><span class="font-semibold">${selectedCar.name}</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">Layanan</span><span class="font-semibold">${serviceLabel}</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">Tanggal Mulai</span><span class="font-semibold">${formatDate(startVal)}</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">Tanggal Selesai</span><span class="font-semibold">${formatDate(endVal)}</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">Durasi</span><span class="font-semibold">${days} Hari</span></div>
+          <hr>
+          <div class="flex justify-between text-blue-700 font-bold text-base"><span>Total Sewa</span><span>Rp ${formatRp(total)}</span></div>
+          <div class="flex justify-between text-orange-600 font-semibold"><span>DP (30%)</span><span>Rp ${formatRp(dp)}</span></div>
+        </div>
+      `;
+
+      // Reset pilihan pembayaran
+      document.querySelectorAll('input[name="payment"]').forEach(r => r.checked = false);
+      document.getElementById('payment-error').classList.add('hidden');
+
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    };
+
+    const closeConfirmModal = () => {
+      document.getElementById('confirm-modal').classList.add('hidden');
+    };
+
+    const processPayment = () => {
+      const selected = document.querySelector('input[name="payment"]:checked');
+      if (!selected) {
+        document.getElementById('payment-error').classList.remove('hidden');
+        return;
+      }
+      document.getElementById('payment-error').classList.add('hidden');
+      document.getElementById('confirm-modal').classList.add('hidden');
+
+      // Tampilkan loading
+      document.getElementById('loading-modal').classList.remove('hidden');
+
+      // Simulasi proses ~1.5 detik lalu tampilkan sukses
+      setTimeout(() => {
+        document.getElementById('loading-modal').classList.add('hidden');
+        const orderNum = 'OTO-' + Date.now().toString().slice(-8).toUpperCase();
+        document.getElementById('order-number').innerText = orderNum;
+        document.getElementById('success-modal').classList.remove('hidden');
+      }, 1500);
+    };
+
+    const closeAllModals = () => {
+      ['booking-modal', 'confirm-modal', 'loading-modal', 'success-modal'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      selectedCar = null;
+      currentBooking = null;
+    };
+
+    // Toast notifikasi ringan
+    const showToast = (msg) => {
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-5 py-3 rounded-xl text-sm shadow-xl z-[80] transition-all';
+      toast.innerText = msg;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    };
+
+    const formatDate = (val) => {
+      const d = new Date(val);
+      return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    };
+
+    window.onload = renderCars;
+  </script>
+</body>
+</html>
